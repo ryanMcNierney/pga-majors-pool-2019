@@ -4,12 +4,18 @@ import ReactDOM from 'react-dom'
 import App from './components/App'
 import { Provider } from 'react-redux'
 import store from './store'
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+
+// components
+import Admin from './components/admin/Admin'
 
 ReactDOM.render(
   <Provider store={store}>
     <Router>
-      <App />
+      <div>
+        <Route exact path="/" component={App} />
+        <Route path="/admin" component={Admin} />
+      </div>
     </Router>
   </Provider>
   ,

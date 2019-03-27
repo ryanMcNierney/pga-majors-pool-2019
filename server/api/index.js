@@ -1,6 +1,7 @@
 const router = require('express').Router()
 
 // router.use('INSERT FILE NAME', require('./FILE PATH')) // matches requests to /api/file name
+router.use('/players', require('./players'))
 
 //404 handling
 router.use(function (req, res, next) {
