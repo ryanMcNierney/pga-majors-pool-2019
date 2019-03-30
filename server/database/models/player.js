@@ -26,6 +26,10 @@ const Player = db.define('players', {
     type: Sequelize.STRING,
     allowNull: false
   },
+  wgr: {
+    type: Sequelize.INTEGER,
+    allowNull: false
+  },
   masters: {
     type: Sequelize.BOOLEAN,
     defaultValue: false
