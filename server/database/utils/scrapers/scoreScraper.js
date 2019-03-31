@@ -20,7 +20,7 @@ const createScoreTable = async () => {
     const scoreTable = {}
     const playerLookUp = await getPlayers()
 
-    $('.table-main > table > tbody').children('tr').each(async (i, elem) => {
+    $('.table-main > table > tbody').children('tr').each((i, elem) => {
       // stats
       const position = $(elem).find('.cell_ra').text()
       const player = $(elem).find('.cell_ab').text()
