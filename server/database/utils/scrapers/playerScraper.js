@@ -54,10 +54,11 @@ const getPlayerData = async (profileArr) => {
       } else {
         wgr = 0
       }
+      const fix_wgr = (wgr === 0)
       const img = await 'https://www.flashscore.com' + $('.participant-imglink').find('img').attr('src')
       const country = await $('.player-name').find('span').attr('title')
       const country_code = await $('.player-name').find('span').attr('class').slice(5)
-      const player = { short_name, long_name, profile, img, country, country_code, wgr }
+      const player = { short_name, long_name, profile, img, country, country_code, wgr, fix_wgr }
       console.log(player)
       playerData.push(player)
 

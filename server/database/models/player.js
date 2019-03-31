@@ -30,6 +30,10 @@ const Player = db.define('players', {
     type: Sequelize.INTEGER,
     allowNull: false
   },
+  fix_wgr: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false
+  },
   masters: {
     type: Sequelize.BOOLEAN,
     defaultValue: false
