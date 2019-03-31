@@ -1,8 +1,10 @@
 // get the live scores
 const puppeteer = require('puppeteer')
 const cheerio = require('cheerio')
-const { parCheck, bonusCheck, totalCheck, getPlayerId } = require('./scoreUtils') // helper functions
 const fb = require('../../../main')
+
+// helper functions
+const { parCheck, bonusCheck, totalCheck, getPlayers } = require('./scoreUtils')
 
 const url = 'https://www.flashscore.com/golf/pga-tour/valspar-championship/'
 
@@ -16,8 +18,9 @@ const createScoreTable = async () => {
     const $ = cheerio.load(html)
 
     const scoreTable = {}
+    const playerLookUp = await getPlayers()
 
-    $('.table-main > table > tbody').children('tr').each((i, elem) => {
+    $('.table-main > table > tbody').children('tr').each(async (i, elem) => {
       // stats
       const position = $(elem).find('.cell_ra').text()
       const player = $(elem).find('.cell_ab').text()
@@ -35,9 +38,13 @@ const createScoreTable = async () => {
       const bonus = bonusCheck(position)
 
       // lookup the player_id from Player postGres
+      const id = playerLookUp[player]
 
-
-      scoreTable[player] = { position, bonus, par, thru, today, rnd_1, rnd_2, rnd_3, rnd_4, total }
+      if (id) {
+        scoreTable[id] = { id, player, position, bonus, par, thru, today, rnd_1, rnd_2, rnd_3, rnd_4, total }
+      } else {
+        console.log(player, 'is not in the postgres database')
+      }
 
     })
 
@@ -50,13 +57,26 @@ const createScoreTable = async () => {
 }
 
 // add the table to firebase
-
 const updateLiveData = async (scoreTable) => {
   try {
-    await fb.ref('masters').set(scoreTable, () => {
-      console.log('Data updated to firebase live-data')
+    let liveData
+    await fb.ref('masters/live-data').once('value').then(snapshot => {
+      liveData = snapshot.val()
     })
-
+    // handle the first data pull
+    if (liveData) {
+      const timeStamp = Date.now()
+      await fb.ref(`masters/archive/${timeStamp}`).set(liveData, () => {
+        console.log('Data Archived', timeStamp)
+      })
+      await fb.ref('masters/live-data').set(scoreTable, () => {
+        console.log('Data updated to firebase live-data')
+      })
+    } else {
+      await fb.ref('masters/live-data').set(scoreTable, () => {
+        console.log('Data updated to firebase live-data')
+      })
+    }
   } catch (e) {
     console.log('Error updated firebase live-data', e)
   }
