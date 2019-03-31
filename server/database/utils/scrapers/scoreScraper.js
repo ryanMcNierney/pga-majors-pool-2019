@@ -84,7 +84,20 @@ const updateLiveData = async (scoreTable) => {
   }
 }
 
-(async () => {
+const updateData = async () => {
   const scoreTable = await createScoreTable()
   await updateLiveData(scoreTable)
-})()
+}
+
+const liveDataON = () => {
+  const timer = setInterval(updateData, 120 * 1000)
+  console.log('----LIVE DATA IS ON----')
+  return timer
+}
+
+const liveDataOFF = (timer) => {
+  clearInterval(timer)
+  console.log('----LIVE DATA STOPPED----')
+}
+
+module.exports = { liveDataON, liveDataOFF }

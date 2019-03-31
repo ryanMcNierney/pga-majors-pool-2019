@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
-import PlayerUpdate from './PlayerUpdate'
+import LiveData from './LiveData'
+import './admin.css'
 
 class Admin extends Component {
   render() {
     return (
-      <div>
+      <div id="admin">
         ADMIN Page
-        <PlayerUpdate />
+        <LiveData />
       </div>
     )
   }

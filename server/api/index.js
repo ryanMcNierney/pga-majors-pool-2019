@@ -2,6 +2,7 @@ const router = require('express').Router()
 
 // router.use('INSERT FILE NAME', require('./FILE PATH')) // matches requests to /api/file name
 router.use('/players', require('./players'))
+router.use('/liveData', require('./liveData'))
 router.use('/admin/players', require('./admin/adminPlayers')) // admin player route
 
 //404 handling

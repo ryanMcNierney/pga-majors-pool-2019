@@ -42,8 +42,6 @@ class PlayerUpdate extends Component {
   }
 
   render() {
-    console.log('major =', this.state.major)
-    console.log('url =', this.state.url)
     return (
       <div id="player-update">
         <br />
