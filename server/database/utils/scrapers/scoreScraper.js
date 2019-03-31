@@ -1,7 +1,9 @@
 // get the live scores
 const puppeteer = require('puppeteer')
 const cheerio = require('cheerio')
-const fb = require('../../../main')
+const firebase = require('firebase')
+const { fbApp } = require('../../../firebase')
+const fb = firebase.database(fbApp)
 
 // helper functions
 const { parCheck, bonusCheck, totalCheck, getPlayers } = require('./scoreUtils')
