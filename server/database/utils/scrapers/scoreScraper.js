@@ -1,7 +1,8 @@
 // get the live scores
 const puppeteer = require('puppeteer')
 const cheerio = require('cheerio')
-const { parCheck, bonusCheck, totalCheck } = require('./scoreUtils') // helper functions
+const { parCheck, bonusCheck, totalCheck, getPlayerId } = require('./scoreUtils') // helper functions
+const fb = require('../../../main')
 
 const url = 'https://www.flashscore.com/golf/pga-tour/valspar-championship/'
 
@@ -33,13 +34,14 @@ const createScoreTable = async () => {
       // bonus check
       const bonus = bonusCheck(position)
 
+      // lookup the player_id from Player postGres
+
+
       scoreTable[player] = { position, bonus, par, thru, today, rnd_1, rnd_2, rnd_3, rnd_4, total }
 
     })
 
     await browser.close()
-
-    console.log('scoreTable', scoreTable)
     return scoreTable
 
   } catch (e) {
@@ -47,4 +49,20 @@ const createScoreTable = async () => {
   }
 }
 
-createScoreTable()
+// add the table to firebase
+
+const updateLiveData = async (scoreTable) => {
+  try {
+    await fb.ref('masters').set(scoreTable, () => {
+      console.log('Data updated to firebase live-data')
+    })
+
+  } catch (e) {
+    console.log('Error updated firebase live-data', e)
+  }
+}
+
+(async () => {
+  const scoreTable = await createScoreTable()
+  await updateLiveData(scoreTable)
+})()

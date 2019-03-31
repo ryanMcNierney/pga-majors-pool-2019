@@ -1,4 +1,5 @@
 // helper functions for scoreScraper.js
+const Player = require('../../../database')
 
 const parCheck = (position, par) => {
   let newPar
@@ -34,4 +35,17 @@ const totalCheck = (position, totalNum) => {
   return total
 }
 
-module.exports = { parCheck, bonusCheck, totalCheck }
+const getPlayerId = async (short_name) => {
+  try {
+    await Player.findOne({ where: { short_name } })
+      .then(player => {
+        const playerId = player.id
+        return playerId
+      })
+  } catch (e) {
+    console.log('Error finding Player', e)
+  }
+
+}
+
+module.exports = { parCheck, bonusCheck, totalCheck, getPlayerId }
