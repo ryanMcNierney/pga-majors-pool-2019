@@ -1,6 +1,10 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 
+// firebase
+if (process.env.NODE_ENV !== 'production') require('../../../.env')
+import { fb } from '../../../server/firebase'
+
 class LiveData extends Component {
   constructor() {
     super()
@@ -13,19 +17,12 @@ class LiveData extends Component {
     this.handleClickOFF = this.handleClickOFF.bind(this)
   }
 
-  async handleSubmit(evt) {
-    evt.preventDefault()
-    try {
-      console.log('Sent a POST to /api/admin/players')
-      const res = await axios.post('/api/admin/players', {
-        major: this.state.major,
-        url: this.state.url
-      })
-      console.log('response =', res)
-    } catch (err) {
-      console.log(err)
-    }
-
+  componentDidMount() {
+    // const archiveRef = fb.ref('masters/archive')
+    // archiveRef.on('value', snapshot => {
+    //   const archive = snapshot.val()
+    //   console.log('archive', archive)
+    // })
   }
 
   async handleClickON() {

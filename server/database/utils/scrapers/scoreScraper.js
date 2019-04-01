@@ -1,9 +1,7 @@
 // get the live scores
 const puppeteer = require('puppeteer')
 const cheerio = require('cheerio')
-const firebase = require('firebase')
-const { fbApp } = require('../../../firebase')
-const fb = firebase.database(fbApp)
+const { fb } = require('../../../firebase')
 
 // helper functions
 const { parCheck, bonusCheck, totalCheck, getPlayers } = require('./scoreUtils')
@@ -70,6 +68,7 @@ const updateLiveData = async (scoreTable) => {
       const timeStamp = Date.now()
       await fb.ref(`masters/archive/${timeStamp}`).set(liveData, () => {
         console.log('Data Archived', timeStamp)
+        return timeStamp // send this timestamp to my admin page somehow
       })
       await fb.ref('masters/live-data').set(scoreTable, () => {
         console.log('Data updated to firebase live-data')
@@ -80,7 +79,7 @@ const updateLiveData = async (scoreTable) => {
       })
     }
   } catch (e) {
-    console.log('Error updated firebase live-data', e)
+    console.log('Error updating firebase live-data', e)
   }
 }
 
