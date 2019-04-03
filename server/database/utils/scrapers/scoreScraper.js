@@ -60,23 +60,46 @@ const createScoreTable = async () => {
 const updateLiveData = async (scoreTable) => {
   try {
     let liveData
-    await fb.ref('masters/live-data').once('value').then(snapshot => {
+    await fb.ref('masters/live-data').once('value', snapshot => {
       liveData = snapshot.val()
     })
-    // handle the first data pull
+    // archive the current data then push to new
     if (liveData) {
-      const timeStamp = Date.now()
-      await fb.ref(`masters/archive/${timeStamp}`).set(liveData, () => {
-        console.log('Data Archived', timeStamp)
-        return timeStamp // send this timestamp to my admin page somehow
+      // get archiveRef & archiveCount
+      const archiveRef = await fb.ref('masters/archive')
+      let archiveCount
+      await archiveRef.child('count').once('value', snapshot => {
+        archiveCount = snapshot.val()
       })
+
+      // add live-data to archive & update count
+      const newArchiveKey = Date.now()
+      await archiveRef.child(newArchiveKey).set(liveData)
+      archiveCount++
+
+      // if archive > 5 remove oldest entry
+      if (archiveCount > 5) {
+        let oldestArchiveKey
+        await archiveRef.once('value', snapshot => {
+          const everything = snapshot.val()
+          const keys = Object.keys(everything)
+          oldestArchiveKey = keys[0]
+        })
+        await archiveRef.child(oldestArchiveKey).remove()
+      } else {
+        await archiveRef.child('count').set(archiveCount)
+      }
+
+      // set live-data with new scoreTable
       await fb.ref('masters/live-data').set(scoreTable, () => {
         console.log('Data updated to firebase live-data')
       })
+      return newArchiveKey
     } else {
       await fb.ref('masters/live-data').set(scoreTable, () => {
         console.log('Data updated to firebase live-data')
       })
+      await fb.ref('masters/archive/count').set(0)
     }
   } catch (e) {
     console.log('Error updating firebase live-data', e)

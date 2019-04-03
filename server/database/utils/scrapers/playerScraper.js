@@ -6,7 +6,7 @@ const fs = require('fs')
 // get the player profile page ID
 const getProfileId = async () => {
   try {
-    const url = 'https://www.flashscore.com/golf/pga-tour/valspar-championship/' // url to scrape
+    const url = 'https://www.flashscore.com/golf/pga-tour/valero-texas-open/' // url to scrape
     const browser = await puppeteer.launch()
     const page = await browser.newPage()
     await page.goto(url)
@@ -59,7 +59,6 @@ const getPlayerData = async (profileArr) => {
       const country = await $('.player-name').find('span').attr('title')
       const country_code = await $('.player-name').find('span').attr('class').slice(5)
       const player = { short_name, long_name, profile, img, country, country_code, wgr, fix_wgr }
-      console.log(player)
       playerData.push(player)
 
       await browser.close()
@@ -67,7 +66,8 @@ const getPlayerData = async (profileArr) => {
         console.log(i + 1);
       }, 1000)
     } catch (e) {
-      console.log('Error grabbing player', e)
+      console.log(e)
+      console.log(`Error grabbing #${i + 1}`)
     }
   }
 
@@ -76,7 +76,7 @@ const getPlayerData = async (profileArr) => {
 
 // save the data as JSON string and JSON.parse(data) to read it
 const savePlayerData = (playerData) => {
-  fs.writeFile('./server/database/utils/scrapers/json-files/valspar.json', JSON.stringify(playerData), 'utf-8', (err) => {
+  fs.writeFile('./server/database/utils/scrapers/json-files/valero.json', JSON.stringify(playerData), 'utf-8', (err) => {
     if (err) {
       console.log(err);
     }
