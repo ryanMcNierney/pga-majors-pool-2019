@@ -4,7 +4,8 @@ const cheerio = require('cheerio')
 const { fb } = require('../../../firebase')
 
 // helper functions
-const { parCheck, bonusCheck, totalCheck, getPlayers } = require('./scoreUtils')
+const { parCheck, bonusCheck, totalCheck, getPlayers, cleanForGoogle } = require('./scoreUtils')
+const { googleMain } = require('./sheetsUpdater')
 
 const url = 'https://www.flashscore.com/golf/pga-tour/valspar-championship/'
 
@@ -58,6 +59,7 @@ const createScoreTable = async () => {
 
 // add the table to firebase
 const updateLiveData = async (scoreTable) => {
+  const newArchiveKey = Date.now()
   try {
     let liveData
     await fb.ref('masters/live-data').once('value', snapshot => {
@@ -73,7 +75,6 @@ const updateLiveData = async (scoreTable) => {
       })
 
       // add live-data to archive & update count
-      const newArchiveKey = Date.now()
       await archiveRef.child(newArchiveKey).set(liveData)
       archiveCount++
 
@@ -91,35 +92,43 @@ const updateLiveData = async (scoreTable) => {
       }
 
       // set live-data with new scoreTable
+      await fb.ref('masters/live-data-status').set(true)
       await fb.ref('masters/live-data').set(scoreTable, () => {
         console.log('Data updated to firebase live-data')
       })
       return newArchiveKey
     } else {
+      await fb.ref('masters/live-data-status').set(true)
       await fb.ref('masters/live-data').set(scoreTable, () => {
         console.log('Data updated to firebase live-data')
       })
       await fb.ref('masters/archive/count').set(0)
+      return newArchiveKey
     }
   } catch (e) {
     console.log('Error updating firebase live-data', e)
   }
 }
 
+// update google sheets
+const updateGoogle = async (scoreTable) => {
+  const batch = await cleanForGoogle(scoreTable)
+  await googleMain(batch)
+}
+
 const updateData = async () => {
   const scoreTable = await createScoreTable()
   await updateLiveData(scoreTable)
+  await updateGoogle(scoreTable)
 }
 
 const liveDataON = () => {
-  const timer = setInterval(updateData, 120 * 1000)
+  updateData()
   console.log('----LIVE DATA IS ON----')
-  return timer
 }
 
-const liveDataOFF = (timer) => {
-  clearInterval(timer)
-  console.log('----LIVE DATA STOPPED----')
+const liveDataOFF = () => {
+  fb.ref('masters/live-data-status').set(false)
 }
 
 module.exports = { liveDataON, liveDataOFF }

@@ -1,15 +1,18 @@
 const router = require('express').Router()
+const { liveDataON, liveDataOFF } = require('../database/utils/scrapers/scoreScraper')
 
 //insert routes here
-router.get('/:status', (req, res) => {
+router.get('/:status', async (req, res) => {
   const status = req.params.status
   if (status === 'on') {
-    console.log('STATUS IS ON')
+    await liveDataON()
+    res.sendStatus(200)
+  } else if (status === 'off') {
+    await liveDataOFF()
+    res.sendStatus(200)
+  } else {
+    res.status(400)
   }
-  if (status === 'off') {
-    console.log('STATUS IS OFF')
-  }
-  res.sendStatus(200)
 })
 
 module.exports = router

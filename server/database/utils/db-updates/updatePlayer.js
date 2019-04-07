@@ -1,5 +1,5 @@
 const { Player } = require('../../../database')
-const playerData = require('../scrapers/json-files/valspar.json')
+const playerData = require('../scrapers/json-files/valero.json')
 
 // update database with new players
 playerData.forEach(async (player) => {
@@ -13,8 +13,14 @@ playerData.forEach(async (player) => {
             console.log('Player is added to the DB')
           })
       } else {
-        console.log('The player is already in the DB')
-        // this is where I can do Player.update()
+        const { short_name } = foundPlayer.dataValues
+        await Player.update({ wgr: player.wgr, masters: true }, {
+          where: { short_name }
+        })
+          .spread((numberOfAffectedRows) => { // because we return a promise for an array, .spread is recommended
+            console.log('affectedRows =', numberOfAffectedRows) // say we had 3 pugs with the age of 7. This will then be 3
+          })
+
       }
     })
 })

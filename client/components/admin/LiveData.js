@@ -10,7 +10,9 @@ class LiveData extends Component {
     super()
     this.state = {
       liveData: false,
-      lastPull: ''
+      lastPull: '',
+      lastPullKey: '',
+      timerRef: {}
     }
 
     this.handleClickON = this.handleClickON.bind(this)
@@ -18,45 +20,61 @@ class LiveData extends Component {
   }
 
   componentDidMount() {
-    // const archiveRef = fb.ref('masters/archive')
-    // archiveRef.on('value', snapshot => {
-    //   const archive = snapshot.val()
-    //   console.log('archive', archive)
-    // })
+    const archiveRef = fb.ref('masters/archive')
+    const liveDataStatus = fb.ref('masters/live-data-status')
+
+    archiveRef.on('value', snapshot => {
+      const timestampArr = Object.keys(snapshot.val())
+      // "count" = last child. this is why we need 2nd to last
+      const lastPullRef = timestampArr[timestampArr.length - 2]
+      const lastPull = new Date(Number(lastPullRef)).toLocaleTimeString()
+      this.setState({ lastPull, lastPullKey: lastPullRef })
+    })
+
+    liveDataStatus.on('value', snapshot => {
+      console.log('live-data-status', snapshot.val())
+      this.setState({ liveData: snapshot.val() })
+    })
+
   }
 
-  async handleClickON() {
+  handleClickON() {
     try {
-      // call api to turn data on
+      // do set interval here
       console.log('Turning live-data ON')
-      await axios.get('/api/liveData/on')
-      this.setState({ liveData: true })
+      const dataON = async () => {
+        await axios.get('/api/livedata/on')
+      }
+      dataON()
+      const timerRef = setInterval(dataON, 60000 * 2)
+      this.setState({ timerRef })
     } catch (e) {
       console.log('Error starting live data')
     }
   }
 
-  async handleClickOFF() {
+  async handleClickOFF(evt) {
     try {
-      // call api to turn data on
+      // call api to turn data off
+      evt.preventDefault()
       console.log('Turning live-data OFF')
-      await axios.get('/api/liveData/off')
-      this.setState({ liveData: false })
+      clearInterval(this.state.timerRef)
+      await axios.get('/api/livedata/off')
     } catch (e) {
-      console.log('Error starting live data')
+      console.log('Error turning data OFF')
     }
   }
 
   render() {
-    const { liveData, lastPull } = this.state
+    const { liveData, lastPull, lastPullKey } = this.state
     return (
       <div id="live-data">
         <h2>Live Data</h2>
         <div id="timer">
           {
             liveData
-              ? <p>Data is ON - Last pull at {lastPull}</p>
-              : <p>Data is OFF - last pull at {lastPull}</p>
+              ? <p>Data is ON - Last pull at {lastPull} - {lastPullKey}</p>
+              : <p>Data is OFF - last pull at {lastPull} - {lastPullKey}</p>
           }
         </div>
         <div id="live-data-buttons">
