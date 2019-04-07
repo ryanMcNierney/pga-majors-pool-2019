@@ -32,7 +32,6 @@ class LiveData extends Component {
     })
 
     liveDataStatus.on('value', snapshot => {
-      console.log('live-data-status', snapshot.val())
       this.setState({ liveData: snapshot.val() })
     })
 

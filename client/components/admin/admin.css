@@ -28,3 +28,16 @@
 #live-data-off {
   background-color: crimson;
 }
+
+/* Scores */
+#score-table {
+  margin-top: 20px;
+}
+
+table {
+  width: 100%
+}
+
+#table-header {
+  text-align: left;
+}
