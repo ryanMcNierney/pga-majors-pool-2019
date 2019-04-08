@@ -9,7 +9,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start-dev": "NODE_ENV='development' npm run start-server & npm run build-watch",
-    "start": "npm run start-server",
+    "start": "npm run start-server & npm run build-watch",
+    "build-watch": "webpack -w",
     "start-server": "node server/main.js & node server/firebase.js",
     "scrape-players": "node server/database/utils/scrapers/playerScraper.js",
     "update-db-player": "node server/database/utils/db-updates/updatePlayer.js",
