@@ -11,6 +11,7 @@
     "start-dev": "NODE_ENV='development' npm run start-server & npm run build-watch",
     "start": "npm run start-server & npm run build-watch",
     "start-server": "node server/main.js & node server/firebase.js",
+    "postinstall": "npm run build-watch",
     "build-watch": "webpack -w",
     "scrape-players": "node server/database/utils/scrapers/playerScraper.js",
     "update-db-player": "node server/database/utils/db-updates/updatePlayer.js",
