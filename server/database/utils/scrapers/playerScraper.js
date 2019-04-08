@@ -6,7 +6,7 @@ const fs = require('fs')
 // get the player profile page ID
 const getProfileId = async () => {
   try {
-    const url = 'https://www.flashscore.com/golf/pga-tour/valero-texas-open/' // url to scrape
+    const url = 'https://www.flashscore.com/golf/pga-tour/masters-tournament/' // url to scrape
     const browser = await puppeteer.launch()
     const page = await browser.newPage()
     await page.goto(url)
@@ -38,7 +38,7 @@ const getPlayerData = async (profileArr) => {
       const browser = await puppeteer.launch()
       const page = await browser.newPage()
       await page.goto(`https://www.flashscore.com/match/${profileArr[i]}/p/#match-summary`)
-      await page.waitForSelector('#content-all')
+      await page.waitForSelector('.player-name')
       const html = await page.content()
       const $ = cheerio.load(html)
 
@@ -76,7 +76,7 @@ const getPlayerData = async (profileArr) => {
 
 // save the data as JSON string and JSON.parse(data) to read it
 const savePlayerData = (playerData) => {
-  fs.writeFile('./server/database/utils/scrapers/json-files/valero.json', JSON.stringify(playerData), 'utf-8', (err) => {
+  fs.writeFile('./server/database/utils/scrapers/json-files/masters.json', JSON.stringify(playerData), 'utf-8', (err) => {
     if (err) {
       console.log(err);
     }

@@ -1,5 +1,5 @@
 const { Player } = require('../../../database')
-const playerData = require('../scrapers/json-files/valero.json')
+const playerData = require('../scrapers/json-files/masters.json')
 
 // update database with new players
 playerData.forEach(async (player) => {
