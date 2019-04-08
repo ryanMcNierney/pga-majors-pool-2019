@@ -11,7 +11,7 @@
     "start-dev": "NODE_ENV='development' npm run start-server & npm run build-watch",
     "start": "npm run start-server",
     "start-server": "node server/main.js & node server/firebase.js",
-    "heroku-postbuild": "webpack -p --config ./webpack.prod.config.js --progress",
+    "heroku-postbuild": "webpack -p --config",
     "scrape-players": "node server/database/utils/scrapers/playerScraper.js",
     "update-db-player": "node server/database/utils/db-updates/updatePlayer.js",
     "scrape-scores": "node server/database/utils/scrapers/scoreScraper.js"
